@@ -91,4 +91,52 @@ public class SkiSlope {
     public void cannotDown() {
         canDown = false;
     }
+
+    public SkiSlope getLeftNeighbor() {
+        if (x == 0) {
+            return null;
+        }
+        return map.getSlope(x - 1, y);
+    }
+
+    public SkiSlope getRightNeighbor() {
+        if (x >= map.getWidth() - 1) {
+            return null;
+        }
+        return map.getSlope(x + 1, y);
+    }
+
+    public SkiSlope getUpNeighbor() {
+        if (y == 0) {
+            return null;
+        }
+        return map.getSlope(x, y - 1);
+    }
+
+    public SkiSlope getDownNeighbor() {
+        if (y >= map.getHeight() - 1) {
+            return null;
+        }
+        return map.getSlope(x, y + 1);
+    }
+
+    @Override
+    public String toString() {
+        String ret = "(" + x + ", " + y + ") " + height;
+
+        return ret;
+    }
+
+    public void printPath() {
+        if (nextSlope == null) {
+            return;
+        }
+
+        SkiSlope slope = this;
+
+        do {
+            System.out.print(slope.toString() + " --> ");
+            slope = slope.getNextSlope();
+        } while (slope != null);
+    }
 }

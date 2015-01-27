@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Queue;
+
 import org.junit.Test;
 
 public class SkiMapTest {
@@ -30,7 +32,7 @@ public class SkiMapTest {
     public void testInit() {
         SkiMap sm = new SkiMap(TEST_MAP);
 
-        sm.init();
+        Queue<SkiSlope> queue = sm.init();
 
         for (int i = 0; i < sm.getHeight(); i++) {
             assertFalse("Element " + 0 + ", " + i + " can left", sm.getSlope(0,
@@ -59,5 +61,53 @@ public class SkiMapTest {
                     + " is not solved!", sm.getSlope(solvedX[i], solvedY[i])
                     .isSolved());
         }
+
+        assertEquals(solvedX.length, queue.size());
+    }
+
+    @Test
+    public void testProcessNeighbor() {
+        SkiMap sm = new SkiMap(TEST_MAP);
+
+        sm.init();
+
+        SkiSlope slope = sm.getSlope(2, 2);
+        assertEquals("Wrong slope!", 2, slope.getHeight());
+        sm.processNeighbor(slope);
+        assertTrue(slope.isSolved());
+    }
+
+    @Test
+    public void testSolve() {
+        SkiMap sm = new SkiMap(TEST_MAP);
+
+        SkiSlope answer = sm.solve();
+
+        assertEquals(2, answer.getX());
+        assertEquals(1, answer.getY());
+        assertEquals(8, answer.getGreatestDrop());
+        assertEquals(5, answer.getGreatestLength());
+
+        SkiSlope bestSource = sm.getSlope(2, 1);
+        assertEquals(8, bestSource.getGreatestDrop());
+        assertEquals(5, bestSource.getGreatestLength());
+
+        System.out.println("*************");
+        System.out.println("ANSWER");
+        System.out.println("*************");
+        System.out.println("DISTANCE: " + answer.getGreatestLength());
+        System.out.println("DESCENT:  " + answer.getGreatestDrop());
+    }
+
+    @Test
+    public void testRealSolve() {
+        SkiMap sm = new SkiMap(REAL_MAP);
+        SkiSlope answer = sm.solve();
+
+        System.out.println("*************");
+        System.out.println("ANSWER");
+        System.out.println("*************");
+        System.out.println("DISTANCE: " + answer.getGreatestLength());
+        System.out.println("DESCENT:  " + answer.getGreatestDrop());
     }
 }
