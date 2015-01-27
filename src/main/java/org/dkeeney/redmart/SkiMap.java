@@ -13,7 +13,7 @@ public class SkiMap {
 
     private static final String DELIMITER = " ";
 
-    public SkiMap(String fileName) throws IOException {
+    public SkiMap(String fileName) {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(getClass()
@@ -30,7 +30,8 @@ public class SkiMap {
                 input = br.readLine();
                 String[] values = input.split(DELIMITER);
                 for (int j = 0; j < values.length; j++) {
-                    map[j][i] = new SkiSlope(j, i, Integer.parseInt(values[j]));
+                    map[j][i] = new SkiSlope(j, i, Integer.parseInt(values[j]),
+                            this);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -38,7 +39,11 @@ public class SkiMap {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            br.close();
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -51,6 +56,55 @@ public class SkiMap {
     }
 
     public int getHeight(int x, int y) {
-        return map[x][y].getHeight();
+        return getSlope(x, y).getHeight();
+    }
+
+    public SkiSlope getSlope(int x, int y) {
+        return map[x][y];
+    }
+
+    protected void init() {
+        SkiSlope slope = null;
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                slope = map[i][j];
+                // border cases
+                if (slope.getX() == 0) {
+                    slope.cannotLeft();
+                } else if (slope.getX() >= width - 1) {
+                    slope.cannotRight();
+                }
+                if (slope.getY() == 0) {
+                    slope.cannotUp();
+                } else if (slope.getY() >= height - 1) {
+                    slope.cannotDown();
+                }
+
+                // having processed border cases before and logic short
+                // circuiting avoids IndexOutOfBoundsException
+                if (slope.canLeft()
+                        && slope.getHeight() <= map[i - 1][j].getHeight()) {
+                    slope.cannotLeft();
+                }
+                if (slope.canRight()
+                        && slope.getHeight() <= map[i + 1][j].getHeight()) {
+                    slope.cannotRight();
+                }
+                if (slope.canUp()
+                        && slope.getHeight() <= map[i][j - 1].getHeight()) {
+                    slope.cannotUp();
+                }
+                if (slope.canDown()
+                        && slope.getHeight() <= map[i][j + 1].getHeight()) {
+                    slope.cannotDown();
+                }
+
+                if (!slope.canLeft() && !slope.canRight() && !slope.canUp()
+                        && !slope.canDown()) {
+                    slope.setGreatestDrop(0);
+                    slope.setGreatestLength(1);
+                }
+            }
+        }
     }
 }
