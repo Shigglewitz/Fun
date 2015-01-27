@@ -6,11 +6,37 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Queue;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestWatchman;
+import org.junit.runners.model.FrameworkMethod;
 
 public class SkiMapTest {
     private static final String TEST_MAP = "/testmap.txt";
     private static final String REAL_MAP = "/map.txt";
+
+    @Rule public TestWatchman watchman = new TestWatchman() {
+        @Override
+        public void starting(FrameworkMethod method) {
+            System.out.println("***");
+            System.out.println("Starting: " + method.getName());
+            System.out.println("***\n");
+        }
+
+        @Override
+        public void failed(Throwable e, FrameworkMethod method) {
+            System.out.println("***");
+            System.out.println(method.getName() + " failed!");
+            System.out.println("***\n");
+        }
+
+        @Override
+        public void succeeded(FrameworkMethod method) {
+            System.out.println("***");
+            System.out.println(method.getName() + " success!");
+            System.out.println("***\n");
+        }
+    };
 
     @Test
     public void testConstructor() {
